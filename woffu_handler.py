@@ -20,7 +20,7 @@ class WoffuHandler:
 
     def load_webdriver(self):
         driver_options = Options()
-        #driver_options.add_argument("--headless")
+        driver_options.add_argument("--headless")
         return webdriver.Firefox(driver_options)
 
 
@@ -53,13 +53,16 @@ class WoffuHandler:
 
     def clock_in(self):
         if self.is_working_day():
-            #TODO: Introduce some random minutes variation for clocking in
             time.sleep(10)
             #print(driver.page_source)
             self.driver.find_element(by=By.XPATH, value="//*[@class='sc-llcuoN jbETVX']").click()
-            self.logger.info("Logged in.")
-            #TODO: Maybe set an event to logout in 8 hours
+            self.logger.info("Checked in.")
 
     def clock_out(self):
         #TODO:
-        return
+        if self.is_working_day():
+            time.sleep(10)
+            #print(driver.page_source)
+            self.driver.find_element(by=By.XPATH, value="//*[@class='sc-llcuoN jbETVX']").click()
+            self.logger.info("Checked out.")
+
