@@ -11,11 +11,11 @@ class WoffuHandler:
     def __init__(self, conf, logger):
         self.config = conf
         self.logger = logger
-        self.driver = self.load_webdriver()
+        #self.driver = self.load_webdriver()
 
 
-    def __del__(self):
-        self.driver.close()
+    #def __del__(self):
+    #    self.driver.close()
 
 
     def load_webdriver(self):
@@ -29,6 +29,7 @@ class WoffuHandler:
         EMAIL = self.config['USER']['EMAIL']
         PASSWORD = self.config['USER']['PASSWORD']
 
+        self.driver = self.load_webdriver()
         self.driver.get("https://" + ORG + ".woffu.com/#/login")
         #time.sleep(10)
         #print(driver.page_source)
@@ -58,6 +59,9 @@ class WoffuHandler:
             self.driver.find_element(by=By.XPATH, value="//*[@class='sc-llcuoN jbETVX']").click()
             self.logger.info("Checked in.")
 
+        self.driver.close()
+
+
     def clock_out(self):
         #TODO:
         if self.is_working_day():
@@ -65,4 +69,6 @@ class WoffuHandler:
             #print(driver.page_source)
             self.driver.find_element(by=By.XPATH, value="//*[@class='sc-llcuoN jbETVX']").click()
             self.logger.info("Checked out.")
+
+        self.driver.close()
 
