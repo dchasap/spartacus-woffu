@@ -43,42 +43,42 @@ def run():
     handler = woffu_handler.WoffuHandler(config, logger)
     
     checkedIn = False
+    checkInTime = datetime.now() 
     while True:
 
-        if (handler.is_working_day()):
-            working_day = True
-        else:
-            working_day = False
-
         currentTime = datetime.now()
-        checkInTime = currentTime 
+        print("current time:")
+        print(currentTime)
+        print("checkin time:")
+        print(checkInTime)
         if (currentTime >= CHECK_IN_TIME
                 and currentTime.replace(hour=16) >= currentTime 
-                and not checkedIn and working_day): 
+                and not checkedIn and handler.is_working_day()): 
             delay_mins = random.randrange(15)
             print("Delay checkin for " + str(delay_mins) + " mins.")
             time.sleep(60*delay_mins)
             handler.login()
             handler.clock_in()
             checkInTime = datetime.now()
-            sleepHours = 8
-            sleepMinutes = delay_mins
+            sleepTime = currentTime.replace(hour=00) + timedelta(hours=8, minutes=delay_mins)
             checkedIn = True
 
-        elif ((checkInTime+timedelta(hours=8)) <= currentTime and checkedIn and working_day):
+        elif ((checkInTime+timedelta(hours=8)) <= currentTime 
+                and checkedIn 
+                and handler.is_working_day()):
             handler.login()
             handler.clock_out()
-            sleepTime = 24 - currentTime.hour + CHECK_IN_TIME
-            sleepMinutes = 0
+            sleepTime = currentTime.replace(hour=00) - currentTime.hour + CHECK_IN_TIME
             checkedIn = False
 
         else:
-            sleepHours = abs(CHECK_IN_TIME.hour - currentTime.now().hour)
-            sleepMinutes = 0
+            if (CHECK_IN_TIME > currentTime):
+                sleepTime = currentTime.replace(hour=00) + (CHECK_IN_TIME - currentTime)
+            else:
+                sleepTime = currentTime.replace(hour=00) - currentTime + CHECK_IN_TIME
 
-        logger.info("sleeping for " + str(sleepHours) + " hours.")
-        sleepTime = (sleepHours * 60*60) + (sleepMinutes * 60)
-        time.sleep(sleepTime)
+        logger.info("sleeping for " + str(sleepTime.hour) + " hours.")
+        time.sleep(sleepTime.hour * 60 * 60)
 
 
 def dameon_run():
